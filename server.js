@@ -3,6 +3,10 @@ const { Pool } = require("pg");
 const bcrypt = require('bcryptjs');  // Add this to hash passwords
 const jwt = require('jsonwebtoken'); // Add this to create JWT tokens
 
+app.get('/admin/test', (req, res) => {
+  res.send("Admin system is working");
+});
+
 // Admin Registration endpoint
 app.post('/admin/register', async (req, res) => {
   const { email, password } = req.body;
