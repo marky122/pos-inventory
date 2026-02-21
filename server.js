@@ -85,3 +85,68 @@ app.get('/admin/products', authenticateAdmin, async (req, res) => {
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
+
+// 7️⃣ **Add New Product**
+app.post('/admin/products', authenticateAdmin, async (req, res) => {
+  const { name, price, stock } = req.body;
+
+  if (!name || !price || !stock) {
+    return res.status(400).json({ error: 'All fields are required.' });
+  }
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO products (name, price, stock) VALUES ($1, $2, $3) RETURNING *',
+      [name, price, stock]
+    );
+    res.status(201).json({ message: 'Product added successfully', product: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Error adding product' });
+  }
+});
+
+// 8️⃣ **Update Product**
+app.put('/admin/products/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { name, price, stock } = req.body;
+
+  if (!name || !price || !stock) {
+    return res.status(400).json({ error: 'All fields are required.' });
+  }
+
+  try {
+    const result = await pool.query(
+      'UPDATE products SET name = $1, price = $2, stock = $3 WHERE id = $4 RETURNING *',
+      [name, price, stock, id]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json({ message: 'Product updated successfully', product: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Error updating product' });
+  }
+});
+
+// 9️⃣ **Delete Product**
+app.delete('/admin/products/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      'DELETE FROM products WHERE id = $1 RETURNING *',
+      [id]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json({ message: 'Product deleted successfully', product: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Error deleting product' });
+  }
+});
+
+// 10️⃣ Start the server
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
