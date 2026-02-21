@@ -7,6 +7,9 @@ app.get('/admin/test', (req, res) => {
   res.send("Admin system is working");
 });
 
+const app = express();
+app.use(express.json());
+
 // Admin Registration endpoint
 app.post('/admin/register', async (req, res) => {
   const { email, password } = req.body;
@@ -74,8 +77,6 @@ app.get('/admin/products', authenticateAdmin, async (req, res) => {
   res.json(result.rows);
 });
 
-const app = express();
-app.use(express.json());
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
